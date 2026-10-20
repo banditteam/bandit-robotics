@@ -1,6 +1,6 @@
 # Bandit Robotics · v0.1 candidate
 
-Bandit is a custom humanoid meme-mascot simulation and hardware built on the open-source RoboParty RP1 24-DoF robot model.
+Bandit: The first open-source meme humanoid robot. Built by the community, brought to life in the physical world.
 
 ## Status
 - **Expressive demo:** scripted PD joint movement with temporary support weld; finishes standing upright. **Not autonomous balance.**

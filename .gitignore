@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.log
+*.blend1
+*.blend2
+blender/source/*.blend
+RP1_description/mjcf/_bandit_*.xml
+.DS_Store

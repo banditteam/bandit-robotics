@@ -20,14 +20,11 @@ The first startup may take time to compile textured, high-detail meshes. Close t
 ## Folder layout
 - `bandit_description/`: final URDF and linked meshes/textures
 - `RP1_description/`: upstream MuJoCo 24-DoF source model and required RP1 meshes
-- `bandit_tools/`: unchanged known-working expressive demo
+- `bandit_tools/`: bandit expressive demo
 - `examples/`: user entry point
 - `controllers/`: future reusable expressive, physics, and locomotion interfaces
 - `blender/`: Blender contribution guidance; `.blend` master staged locally, not committed by default
 - `tests/`: dependency and static portability checks
 
-## Limitations
-The v0.1 wave demo currently composes the MuJoCo scene dynamically from the upstream model and Bandit URDF. The model is not guaranteed to balance or walk. Detailed CAD/exploded-view assets are developed separately.
-
 ## Upstream / licensing
-RoboParty's deployment source is GPL-3.0-only according to its LICENSES.md; RP1 mechanical designs and third-party textures may carry other terms. **This candidate is not cleared for publication until every bundled model, material, and asset license has been verified.** See LICENSES.md.
+Bandit is an open-source robotics project released under the MIT License for its original software and contributions. Certain third-party components, including RoboParty deployment resources, RP1 mechanical designs, and external assets, may be governed by their respective licenses.

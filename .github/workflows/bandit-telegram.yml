@@ -27,7 +27,7 @@ jobs:
           import html
           import urllib.request
 
-          with open(os.environ["EVENT_PATH"], encoding="utf-8") as f:
+          with open(os.environ["GITHUB_EVENT_PATH"], encoding="utf-8") as f:
               event = json.load(f)
 
           commit = event.get("head_commit") or {}

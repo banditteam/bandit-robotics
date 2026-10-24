@@ -16,39 +16,78 @@ jobs:
           BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TOPIC_ID: ${{ secrets.TELEGRAM_TOPIC_ID }}
-          REPOSITORY: ${{ github.repository }}
           BRANCH: ${{ github.ref_name }}
           ACTOR: ${{ github.actor }}
-          EVENT_PATH: ${{ github.event_path }}
+
         run: |
           python3 - <<'PY'
           import os
           import json
           import html
+          import re
           import urllib.request
 
+          # Read the GitHub push event
           with open(os.environ["GITHUB_EVENT_PATH"], encoding="utf-8") as f:
               event = json.load(f)
 
-          commit = event.get("head_commit") or {}
-          raw_message = commit.get("message") or "New update"
-          description = html.escape(raw_message[:1200])
+          commits = event.get("commits", [])
+          head = event.get("head_commit") or {}
+
+          raw_message = head.get("message") or "New development update"
+
+          # Remove technical GitHub merge headers
+          def clean_message(message):
+              lines = message.strip().splitlines()
+              if not lines:
+                  return "New development update"
+
+              first = lines[0].strip()
+
+              # Standard GitHub merge commit
+              if re.match(r"^Merge pull request #\d+\b", first):
+                  remaining = [
+                      line.strip()
+                      for line in lines[1:]
+                      if line.strip()
+                  ]
+
+                  if remaining:
+                      return "\n".join(remaining)
+
+                  # Fallback to non-merge commits
+                  for commit in reversed(commits):
+                      msg = commit.get("message", "").strip()
+                      if msg and not msg.startswith("Merge "):
+                          return msg
+
+                  return "New code changes merged into main"
+
+              return message.strip()
+
+          description = clean_message(raw_message)
+
+          # Keep within Telegram message limits
+          description = html.escape(description[:1500])
+
           author = html.escape(os.environ["ACTOR"])
           branch = html.escape(os.environ["BRANCH"])
-          url = event.get("compare") or commit.get("url", "")
-          count = len(event.get("commits", []))
+
+          # GitHub compare link
+          url = event.get("compare") or head.get("url", "")
+          count = len(commits)
 
           message = (
-              "🚀 <b>BANDIT JUST GOT AN UPGRADE!</b>\n\n"
-              "Fresh code has landed. 🦝\n\n"
-              f"🔧 <b>What's new?</b>\n{description}\n\n"
+              "🔧 <b>BANDIT DEV LOG</b>\n\n"
+              "New progress in Bandit's development! 🦝\n\n"
+              f"<b>What's changed?</b>\n{description}\n\n"
               f"👨‍💻 Contributor: {author}\n"
-              f"🌿 Branch: {branch}\n"
-              f"📦 Commits: {count}\n\n"
+              f"📦 {count} commit{'s' if count != 1 else ''} "
+              f"pushed to {branch}\n\n"
               "⚡ Every commit brings Bandit closer to life."
           )
 
-          if url:
+          if url and url.startswith("https://github.com/"):
               safe_url = html.escape(url, quote=True)
               message += (
                   f'\n\n🔗 <a href="{safe_url}">'
@@ -60,7 +99,9 @@ jobs:
               "message_thread_id": int(os.environ["TOPIC_ID"]),
               "text": message,
               "parse_mode": "HTML",
-              "link_preview_options": {"is_disabled": True}
+              "link_preview_options": {
+                  "is_disabled": True
+              }
           }).encode("utf-8")
 
           request = urllib.request.Request(
@@ -74,7 +115,9 @@ jobs:
 
           with urllib.request.urlopen(request, timeout=20) as response:
               result = json.load(response)
+
               if not result.get("ok"):
                   raise RuntimeError("Telegram rejected the message")
+
               print("Bandit notification sent successfully!")
           PY

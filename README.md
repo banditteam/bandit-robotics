@@ -12,7 +12,7 @@ Whether you're a robotics engineer, developer, researcher, student, or enthusias
 
 - **Expressive behaviors** — Make Bandit wave, dance, gesture, react, or develop its own personality.
 - **Custom controllers** — Experiment with joint movements, control algorithms, and new robotic capabilities.
-- **Physics simulations** — Explore joint dynamics, gravity, collisions, inertia, and robotic motion.
+- **Physics simulations** — Explore joint dynamics, gravity, collisions, and robotic motion.
 - **Locomotion** — Contribute toward balancing, walking, turning, and more advanced movement.
 - **Hardware extensions** — Add joints, sensors, actuators, or new components and test their behavior in simulation.
 - **Community experiments** — Build new applications, share examples, and extend what Bandit can do.
@@ -21,19 +21,20 @@ Your contribution doesn't need to be a major breakthrough. A new gesture, better
 
 ## What's Included?
 
-Bandit Robotics provides a standalone simulation and development foundation.
+The initial Bandit Robotics release provides a working standalone simulation and development foundation.
 
 | Component | Description |
 |---|---|
-| **Bandit Description** | Custom robot model with URDF, MJCF, meshes, textures, and joint definitions. |
-| **MuJoCo Simulation** | Standalone physics-based simulation using Bandit's own model and assets. |
-| **Expressive Demo** | Supported standing and overhead waving, driven by joint actuators with MuJoCo physics. |
-| **Controller Examples** | Python examples for inverse kinematics, joint movements, and actuator control. |
+| **Bandit Description** | Custom Bandit robot model, including URDF resources, standalone MJCF, meshes, textures, and joint definitions. |
+| **MuJoCo Simulation** | Physics-based simulation using Bandit's standalone MJCF and assets. |
+| **Expressive Demo** | Working reference demonstration featuring supported standing, coordinated arm raising, and overhead waving. |
+| **Controller Examples** | Python examples for exploring inverse kinematics, joint targets, actuator commands, and motion control. |
 | **Simulation Tools** | Scripts and utilities used to prepare and run Bandit. |
-| **Optional Compiled Model** | Precompiled MJB for faster model loading, available through Git LFS. |
 | **Tests & Documentation** | Resources for validating the robot model and development environment. |
 
+The initial robot uses a **24-degree-of-freedom architecture** based on the open-source RoboParty RP1 platform.
 
+The standalone MuJoCo model is independently loadable.
 ## Getting Started
 
 ### 1. Clone the Repository
@@ -43,25 +44,7 @@ git clone https://github.com/banditteam/bandit-robotics.git
 cd bandit-robotics
 ```
 
-**The precompiled MJB is optional.** You can run Bandit directly from its editable MJCF and accompanying assets.
-
-To avoid automatically downloading large Git LFS files when cloning, use:
-
-```bash
-GIT_LFS_SKIP_SMUDGE=1 git clone https://github.com/banditteam/bandit-robotics.git
-cd bandit-robotics
-```
-
-For Windows PowerShell, use:
-
-```powershell
-$env:GIT_LFS_SKIP_SMUDGE = "1"
-git clone https://github.com/banditteam/bandit-robotics.git
-Remove-Item Env:\GIT_LFS_SKIP_SMUDGE
-cd bandit-robotics
-```
-
-The compiled MJB is retained in the repository as an optional asset for contributors who prefer faster startup.
+The included standalone MJCF and assets are sufficient to run Bandit's current simulation. No separately downloaded robot model is needed.
 
 ### 2. Install Dependencies
 
@@ -71,7 +54,7 @@ Use Python 3.12 in a virtual environment.
 python -m venv .venv
 ```
 
-Activate the environment.
+Activate the environment:
 
 **Windows (PowerShell):**
 
@@ -85,7 +68,7 @@ Activate the environment.
 source .venv/bin/activate
 ```
 
-Install dependencies:
+Install the dependencies:
 
 ```bash
 pip install -r requirements.txt
@@ -93,58 +76,34 @@ pip install -r requirements.txt
 
 ### 3. Launch Bandit
 
-Launch the standalone simulation:
+Run the standalone MuJoCo reference demonstration:
 
 ```bash
 python examples/run_bandit_standalone.py
 ```
 
-Bandit will load into MuJoCo and perform its expressive sequence:
+Bandit loads its editable `bandit.xml` model and performs an expressive movement sequence: hands-down standing, raising both arms, overhead waving, and returning to rest.
 
-1. Supported standing.
-2. Both arms raising overhead.
-3. Side-to-side waving.
-4. Returning to the resting position.
+The demonstration uses inverse kinematics to calculate target poses and joint actuators to execute them through MuJoCo physics.
 
-The demonstration uses actuator-driven joint control with simulated dynamics, inertia, gravity, and contacts.
-
-A temporary development support constraint stabilizes Bandit's base. This is **not an autonomous balancing or walking demonstration**.
-
-**Model loading:** The launcher uses `bandit.mjb` when a valid compiled binary is available, otherwise it falls back to `bandit.xml`.
-
-No MJB download is required to run the simulation.
+A temporary development support constraint stabilizes the robot during the sequence. **This is not an autonomous balancing or walking controller.**
 
 ### 4. Explore the Robot
 
-Bandit's standalone MuJoCo model is located in:
+Bandit's standalone MuJoCo files are located in:
 
 ```text
 bandit_description/
 ├── mjcf/
-│   ├── bandit.xml
-│   └── bandit.mjb        # Optional, Git LFS
+│   └── bandit.xml
 └── assets/
     ├── meshes/
     └── textures/
 ```
 
-The editable MJCF is the primary robot description and source of truth.
+Inspect the robot description, examine its joints and actuators, modify the Python controller, or create your own experiments using the provided examples.
 
-The MJB is an optional compiled snapshot for faster loading. It is not required for editing the robot or developing controllers.
-
-**Optional MJB download**
-
-If you cloned without downloading LFS assets and want the compiled model later:
-
-```bash
-git lfs pull --include="bandit_description/mjcf/bandit.mjb"
-```
-
-After downloading, the standalone launcher can use the compiled version automatically.
-
-If you modify the MJCF or its assets, regenerate the compiled binary before using it again.
-
-For Bandit's separately maintained URDF and robot geometry, visit [Bandit Description](https://github.com/banditteam/bandit-description).
+The editable MJCF is the source of truth for this MuJoCo simulation. For the separately maintained robot description and URDF resources, visit [Bandit Description](https://github.com/banditteam/bandit-description).
 
 ## Contribute New Behaviors
 
@@ -156,12 +115,10 @@ Possible contributions include:
 
 - Greeting and waving variations.
 - Celebrations, dancing, and expressive reactions.
-- Head and tail movements for compatible robot variants.
+- Head and tail movements for robot variants with suitable joints and actuators.
 - Improved joint control and motion timing.
 - New physics experiments.
 - Interactive or sensor-driven behaviors.
-
-The existing expressive demonstration includes inverse-kinematics-based arm positioning, actuator control, smooth transitions, and physics-based execution.
 
 Test your contribution locally, document how it works, and submit a pull request.
 
@@ -171,18 +128,18 @@ As the platform evolves, we plan to introduce a reusable control SDK and portabl
 
 Bandit is designed for experimentation.
 
-Developers can use the standalone robot description and MuJoCo implementation to experiment with joint targets, actuator commands, physical interactions, and movement sequences.
+Developers can use the standalone robot description and MuJoCo reference implementation to experiment with joint targets, actuator commands, physical interactions, and movement sequences.
 
-The existing expressive demonstration combines:
+The current expressive demonstration includes:
 
-- **Inverse kinematics** for calculating target arm poses.
-- **Joint-space control** for tracking desired positions.
-- **Actuator-driven physics** for dynamic simulation.
-- **Smooth sequencing** for transitions between poses.
+- **Inverse kinematics** to calculate arm poses from wrist-position targets.
+- **Joint-space feedback control** to track target positions.
+- **Actuator-driven simulation** with joint dynamics, gravity, and contacts.
+- **Smooth pose transitions** for coordinated expressive motion.
 
-These are reference implementations, not restrictions on what contributors can build.
+The existing expressive demonstration is a reference implementation—not a restriction on what contributors can build.
 
-Our longer-term goal is to provide reusable controller interfaces supporting different robot configurations and simulation environments.
+Our longer-term goal is to provide reusable controller interfaces that support different robot configurations and simulation environments.
 
 ## Development Roadmap
 
@@ -191,14 +148,14 @@ Bandit is an evolving community project.
 | Area | Status |
 |---|---|
 | Custom Bandit URDF and visual assets | Available |
-| Standalone MuJoCo MJCF and assets | Available |
-| Supported standing and physics-based expressive wave | Available |
-| Python motion examples | Available |
-| Optional compiled MJB | Available |
+| Standalone Bandit MJCF and MuJoCo assets | Available |
+| MuJoCo physics simulation | Available |
+| Supported standing and expressive wave | Available |
+| Python motion examples | Initial release |
 | Reusable Control SDK | Planned |
 | Community behavior library | Planned |
-| Head, tail, and hardware extensions | Open for contributions |
-| Autonomous balancing and locomotion | In development |
+| Hardware and joint extensions | Open for contributions |
+| Autonomous balancing and locomotion | Future development |
 | ROS 2 integration | Future development |
 | Additional simulator integrations | Open for contributions |
 
@@ -220,7 +177,7 @@ The main development platform for robotics software, simulation, expressive beha
 
 **Import it. Customize it. Make it move.**
 
-The standalone robot description, including the URDF, geometry, materials, and joint structure.
+The separate robot description repository, including URDF resources, geometry, materials, and joint structure.
 
 Use it as the starting point for your own simulation environment or robot variant.
 

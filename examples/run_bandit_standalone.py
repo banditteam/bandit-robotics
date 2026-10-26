@@ -4,7 +4,7 @@ Bandit standalone expressive wave.
 Preserves the original Bandit inverse kinematics,
 wave sequence, motor controller, and MuJoCo physics.
 
-Uses Bandit's own MJCF/MJB model.
+Loads Bandit's standalone MJCF model directly (no compiled MJB required).
 """
 
 from pathlib import Path
@@ -16,23 +16,15 @@ import numpy as np
 
 PROJECT = Path(__file__).resolve().parents[1]
 
-MJB = PROJECT / "bandit_description" / "mjcf" / "bandit.mjb"
 XML = PROJECT / "bandit_description" / "mjcf" / "bandit.xml"
 
 FPS = 50
 
-if MJB.is_file():
-    print("Loading cached Bandit model:", MJB)
-    model = mujoco.MjModel.from_binary_path(str(MJB))
+if not XML.is_file():
+    raise FileNotFoundError(f"Missing standalone Bandit MJCF: {XML}")
 
-elif XML.is_file():
-    print("Loading Bandit XML:", XML)
-    model = mujoco.MjModel.from_xml_path(str(XML))
-
-else:
-    raise FileNotFoundError(
-        "Missing bandit.mjb and bandit.xml"
-    )
+print("Loading standalone Bandit model:", XML)
+model = mujoco.MjModel.from_xml_path(str(XML))
 
 data = mujoco.MjData(model)
 mujoco.mj_resetData(model, data)
@@ -114,7 +106,6 @@ def solve_wrist_pose(start, goal_by_side, iterations=160):
     return q
 
 
-# Target offsets are in meters from each shoulder, not guessed joint angles.
 # Lower = hands beside torso; High = hands above the shoulder near the head.
 rest_goals = {}
 high_goals = {}
@@ -138,8 +129,6 @@ wave_right_goals = {s: target + np.array([0, -outward[s]*0.065, 0])
                     for s, target in high_goals.items()}
 wave_right = solve_wrist_pose(high_pose, wave_right_goals)
 
-# Note: model may not reach exact targets because of joint limits, geometry,
-# or singularities. The printed errors make this visible instead of pretending
 # every pose is achievable.
 sequence = [
     ('Idle: hands DOWN', rest_pose, 1.5),
@@ -178,7 +167,6 @@ if not np.allclose(model.actuator_gear[:, 0], 1.0):
     raise RuntimeError('Motor gearing is not 1:1; review physics torque mapping')
 
 # Conservative position servo gains for this supported *development* test.
-# These aren't a trained balance controller and must not drive real hardware.
 KP = np.full(model.nu, 50.0)
 KD = np.full(model.nu, 5.0)
 KP[:14] = 100.0       # legs and waist held near idle

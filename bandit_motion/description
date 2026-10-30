@@ -1,0 +1,11 @@
+Adds Bandit's physical motion package with the existing ONNX policies and standalone MuJoCo demonstration scripts.
+
+**Included**
+- Physics-based wave with supported base (`policy_wave.onnx` + `wave.npz`)
+- Experimental free-base locomotion (`policy_walk.onnx`)
+- 24-DOF robot and walking configurations
+- Python dependencies and portable model paths
+
+**Validation**
+- Wave: `python bandit_motion/scripts/test_bandit_wave_stable.py`
+- Walk: `python bandit_motion/scripts/test_bandit_walk_v2.py --vx 0.40 --duration 8`

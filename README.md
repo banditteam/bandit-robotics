@@ -1,4 +1,5 @@
 # Bandit Robotics
+<img width="1280" height="684" alt="image" src="https://github.com/user-attachments/assets/b0953c69-46b6-4a2c-8d8d-b37e28fb6c90" />
 
 Bandit Robotics is the open-source development platform for Bandit, a community-driven humanoid robot built to evolve through experimentation, collaboration, and shared innovation.
 
